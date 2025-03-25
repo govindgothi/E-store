@@ -1,3 +1,4 @@
+import { Outlet } from 'react-router'
 import './App.css'
 
 function App() {
@@ -5,7 +6,9 @@ function App() {
 
   return (
     <>
-    <div>Hello</div>
+    <div className='bg-gray-100  w-screen h-screen'>
+    <Outlet></Outlet>
+    </div>
     </>
   )
 }
