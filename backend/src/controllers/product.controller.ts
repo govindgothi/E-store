@@ -8,13 +8,14 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 const ListNewProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, type, description, price, discountPercentage, thumbNailImage, imageList, stock, quantity } = req.body;
+      const {userId, name, type, description, price, discountPercentage, thumbNailImage, imageList, stock, quantity } = req.body;
       
-      if (!name || !type || !price || !discountPercentage || !thumbNailImage || !stock || !quantity) {
+      if (!userId || !name || !type || !price || !discountPercentage || !thumbNailImage || !stock || !quantity) {
         return res.status(400).json({ success: false, message: "All fields are required" });
       }
       
       const newProduct = await Product.insertMany({
+        userId,
         name,
         type,
         description,
@@ -38,24 +39,29 @@ const ListNewProduct = asyncHandler(
 
 const updateProduct = asyncHandler(async(req: Request, res: Response, next: NextFunction)=>{
     try{
-        const _id:string ='67de1e3317b15f9310714c25'
-        const updatedFields = req.body;
-
+        // const _id:string ='67de1e3317b15f9310714c25'
+        // const updatedFields = req.body;
+        const { _id } = req.params; 
+        const updateFields = req.body
+        if (!Object.keys(updateFields).length) {
+          return res.status(400).json({ success: false, message: "No fields provided to update" });
+        }
         const updatedDoc = await Product.findByIdAndUpdate(
             _id,
-            { $set: updatedFields }, 
+            { $set: updateFields }, 
             {
                 new: true, 
                 runValidators: true,
             }
         );
-        console.log(updatedDoc)
-        return res.json(updatedDoc)
-
-    }catch(err){
-        console.log("err",err)
-        res.json
-    }
+        if (!updatedDoc) {
+          return res.status(404).json({ success: false, message: "Contact not found" });
+        }
+    
+        res.status(200).json({ success: true, message: "Contact updated", data: updatedDoc });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
 })
 
 

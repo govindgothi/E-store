@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 
 interface IProduct extends Document {
+  userId:Schema.Types.ObjectId
   name: string;
   type: string;
   description: string[];
@@ -13,6 +14,10 @@ interface IProduct extends Document {
 }
 
 const productSchema = new Schema<IProduct>({
+  userId:{
+    type:Schema.Types.ObjectId,
+    ref:'User',
+  },
   name: {
     type: String,
     maxLength: 100,
@@ -97,7 +102,7 @@ const productSchema = new Schema<IProduct>({
     required: [true, "quantity of product is must"],
     validate: {
       validator: function () {
-        return this.quantity.length > 1;
+        return this.quantity.length > 0;
       },
       message: "quantity is must to list product",
     },

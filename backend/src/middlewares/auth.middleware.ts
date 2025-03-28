@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js";
 import { NextFunction, Request, Response } from "express";
 import dotenv from 'dotenv'
+import { asyncHandler } from "../utils/asyncHandler.js";
 dotenv.config()
 const AccessTokenSecret: string =
   process.env.ACCESS_TOKEN_SECRET || "jsdhjsdchcdhsvcv";
@@ -12,11 +13,11 @@ const AccessTokenSecret: string =
     user?: any; // Define `user` as needed
   }
 
- const verifyJWT = async(req: AuthRequest, res:Response, next:NextFunction) => {
+ const verifyJWT = asyncHandler( async(req: AuthRequest, res:Response, next:NextFunction) => {
     try {
-        const token = req.body.cookies //?.accessToken // take token from web to saved cookie 
+        const token = req.cookies.cookie //?.accessToken // take token from web to saved cookie 
         
-         console.log(token);
+         console.log("token",token);
         if (!token) {
             return res.json(new ApiError(401, "Unauthorized request"))
         }
@@ -42,5 +43,5 @@ const AccessTokenSecret: string =
         }
     }
     
-}
+})
 export {verifyJWT}

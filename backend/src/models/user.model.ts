@@ -80,8 +80,8 @@ const userSchema = new Schema<IUser>(
       mobileNumber:{
         type: Number,
         trim: true,
-        max:10,
-        min:10,
+        // max:10,
+        // min:10,
       },
     },
     gender: {
@@ -135,7 +135,7 @@ userSchema.methods.generateAccessToken = function (): string {
       username: this.username,
     },
     AccessTokenSecret,
-    { expiresIn: ExpireAccessToken }
+    { expiresIn: 3600 } //ExpireAccessToken
   );
 };
 
@@ -144,7 +144,7 @@ userSchema.methods.generateRefreshToken = function (): string {
   return jwt.sign(
     { _id: this._id },
     RefreshTokenSecret,
-    { expiresIn: ExpireRefreshToken }
+    { expiresIn: 7200 } //ExpireRefreshToken
   );
 };
 

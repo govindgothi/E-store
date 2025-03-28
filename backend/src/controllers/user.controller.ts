@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User,IUser } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 interface AuthRequest extends Request {
     user?: any; // Define `user` as needed
@@ -31,9 +32,10 @@ const generateAccessAndRefereshTokens = async (userId:string|undefined|null|unkn
   }
 };
 
-const registerUser = async (req:Request, res:Response, next:NextFunction) => {
+const registerNewUser = asyncHandler(async (req:Request, res:Response, next:NextFunction) => {
   try {
     const { username, email, password } = req.body;
+    
     if (!username || !email || !password) {
       return next(
         new ApiError(
@@ -42,26 +44,45 @@ const registerUser = async (req:Request, res:Response, next:NextFunction) => {
         )
       );
     }
+    
     const existedUser = await User.findOne({ email });
-    // console.log(existedUser)
+    console.log(existedUser)
+  
     if (existedUser) {
-      return next(new ApiError(301, "user is already register."));
+        console.log("object exited",existedUser)
+      return res.json(new ApiError(301, "user is already register."));
     }
-    const user = await User.create({
-      username: username.toLowerCase(),
-      email,
-      password,
-    });
-    const userset = await User.findById(user._id);
+    console.log("object",username, email, password)
+    const newUser = await User.create({
+        username,
+        email,
+        password, // Must match password regex
+        contact: {
+          countryCode: 91,
+          mobileNumber: 9876543210,
+        },
+        gender: "Male",
+        address: [],
+        order: [],
+        addReview: [],
+      });
+      console.log("User created:", newUser);
+      
+    console.log("user",newUser)
+    const userset = await User.findById(newUser._id);
     if (!userset) {
-      return next(new ApiError(401, "error in registration."));
+      return res.json(new ApiError(401, "error in registration."));
     }
     return res.json(userset);
-  } catch {}
-};
+  } catch(err) {
+    console.log("err",err)
+       return res.json(new ApiError(301,'INTERNAL ERR'))
+  }
+});
 
-const loginUser = async (req:Request, res:Response, next:NextFunction) => {
+const loginUser = asyncHandler(async (req:Request, res:Response, next:NextFunction) => {
   try {
+    console.log("object")
     const { email, password } = req.body;
     if (!email || !password) {
       return next(new ApiError(401, "credentials are missing."));
@@ -85,21 +106,19 @@ const loginUser = async (req:Request, res:Response, next:NextFunction) => {
     );
 
     const options = {
-      httpOnly: true, //Setting httpOnly to true makes the cookie inaccessible to JavaScript running in the browser. This is primarily a security feature that helps prevent Cross-Site Scripting (XSS) attacks.
-      secure: true, //Setting secure to true ensures the cookie is only sent over HTTPS connections, not plain HTTP. This helps protect the cookie from being intercepted in transit, which is crucial for security,
-    };
-
+        httpOnly: true, // Prevents JavaScript access for security
+        secure: false, // Set to true in production (HTTPS) // CSRF protection
+        maxAge: 3600 * 1000, // 1 hour in milliseconds
+      };
+    console.log(accessToken,"accestoke")
     return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
+      .cookie("cookie", accessToken, options)
       .json(
         new ApiResponse(
           200,
           {
             user: loggedInUser,
-            accessToken,
-            refreshToken,
           },
           "User logged In Successfully"
         )
@@ -107,9 +126,9 @@ const loginUser = async (req:Request, res:Response, next:NextFunction) => {
   } catch {
     return res.json(new ApiError(501, "something is wrong"));
   }
-};
+});
 
-const logoutUser = async (req:AuthRequest, res:Response, next:NextFunction) => {
+const logoutUser = asyncHandler(async (req:AuthRequest, res:Response, next:NextFunction) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -128,9 +147,12 @@ const logoutUser = async (req:AuthRequest, res:Response, next:NextFunction) => {
     }
     return res
     .status(200)
+    .clearCookie('cookie',options)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logged Out"))
-}
+})
 
-export { registerUser, loginUser,logoutUser };
+
+
+export { registerNewUser, loginUser,logoutUser };
