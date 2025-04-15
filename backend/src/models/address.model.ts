@@ -37,6 +37,7 @@ const addressSchema = new Schema<IAddress>({
             type:String,
             required:[true,'state is require']
         },
+
         zipCode:{ 
             type:Number,
             required:[true,'zipcode is require'],

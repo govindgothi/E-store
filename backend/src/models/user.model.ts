@@ -72,22 +72,17 @@ const userSchema = new Schema<IUser>(
           "Password must be at least 8 characters long, with one uppercase letter, one lowercase letter, one number, and one special character.",
       },
     },
-    contact: {
-      countryCode:{
-        type:Number,
+    // contact: {
+    //   countryCode:{
+    //     type:Number,
         
-      },
-      mobileNumber:{
-        type: Number,
-        trim: true,
-        // max:10,
-        // min:10,
-      },
-    },
-    gender: {
-      type: String,
-      enum: ["Male", "Female", "Other"],
-    },
+    //   },
+    //   mobileNumber:{
+    //     type: Number,
+    //     trim: true,
+    //   },
+    // },
+    contact:[],
     address: [
         {
           type: Schema.Types.ObjectId,

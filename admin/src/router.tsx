@@ -1,6 +1,6 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router";
 import App from "./App";
-import AddOrder from "./pages/AddProduct";
+// import AddOrder from "./pages/AddProduct";
 import Home from "./pages/Home";
 // import Home from "./pages/Home/Home";
 // import Cart from "./pages/Cart/Cart";

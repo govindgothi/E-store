@@ -1,18 +1,34 @@
 import { Schema,model } from "mongoose";
 
 interface verifyOtpType extends Document{
-  email:string,
-  contact:number,
+  email?:string,
+  contact?:number,
   sendOtp:number,
   exp:Date
 }
 
 const verifyOtpSchema = new Schema<verifyOtpType>({
    email:{
-    type:String,
+    type: String,
+    validate: {
+      validator: function (value: string) {
+        if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)&& (value || this.contact)){
+         return true
+        }else false; 
+      },
+      message: "Invalid email format",
+    },
    },
    contact:{
-    type:Number
+    type:Number,
+    validate: {
+      validator: function (value:number) {
+        if(value || this.email){
+          return true
+        }else false
+      },
+      message: "Invalid email format",
+    },
    },
    sendOtp:{
     type:Number,
