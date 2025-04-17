@@ -3,7 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 // import Globally from "../../../assets/Globally.png";
 import Globally from "../../assets/Globally.png"
 import Input from "../User-Auth/Input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { loginInput } from "../../../interface-types";
 import { Link } from "react-router";
 import { createPortal } from "react-dom";
@@ -28,12 +28,17 @@ const LoginComp: React.FC<propTypeLogin> = ({
     email: "",
     password: "",
   });
+  const [error,setError] = useState({
+    email:'',
+    password:''
+  })
   
 
   const handleChangeLoginInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const { name, value } = e.target;
-    setLoginData((prev) => (console.log(prev), { ...prev, [name]: value }));
+    const { name, value }:{ name: string; value: string } = e.target;
+    setError((prev) => ({ ...prev, [name]: '' }));
+    setLoginData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validationConfig:Record<keyof loginInput,Rule[]> ={
@@ -74,10 +79,22 @@ const LoginComp: React.FC<propTypeLogin> = ({
 const handleSubmit =(e:any)=>{
  e.preventDefault()
  const validateResult = validate(loginData)
- console.log(validateResult)
+ Object.entries(validateResult).forEach(([key,value])=>{
+  setError((prev)=>({...prev,[key]:value}))
+ })
+ if(Object.entries(validateResult).length){
+  return null
+ }
+ console.log("submit")//api call 
+ setLoginData({
+  email:'',
+  password:''
+ })
 }
 
-
+ useEffect(()=>{
+ console.log(error)
+ },[error])
   return createPortal(
     <div className="absolute top-1/2 left-1/2 z-50 w-[22rem] -translate-x-1/2 -translate-y-1/2 transform rounded-lg border-2 bg-white">
       <div
@@ -99,12 +116,14 @@ const handleSubmit =(e:any)=>{
           name="email"
           value={loginData.email}
           onChange={handleChangeLoginInput}
+          err={error?.email}
         />
         <Input
           type="password"
           name="password"
           value={loginData.password}
           onChange={handleChangeLoginInput}
+          err={error?.password}
         />
       </div>
       <button className="mx-4 mt-8 w-[90%] rounded-lg bg-green-500 py-1 text-xl"

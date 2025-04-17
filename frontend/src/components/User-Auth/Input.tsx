@@ -6,8 +6,9 @@ type take ={
   name:string,
   value:string,
   onChange:(e: React.ChangeEvent<HTMLInputElement>) => void; 
+  err:string
 }
-const Input:React.FC<take> = ({type,name,value,onChange}) => {
+const Input:React.FC<take> = ({type,name,value,onChange,err}) => {
   return (<>
     <div className='w-[90%] mx-auto h-9 mt-7  border-2 border-black rounded-md' >
       <input 
@@ -19,7 +20,7 @@ const Input:React.FC<take> = ({type,name,value,onChange}) => {
         onChange={onChange}
        />
     </div>
-    <p className='w-[80%] left-7 absolute text-red-700 mt-0 text-xs'>email is already register</p>
+    <p className='w-[80%] left-7 absolute text-red-700 mt-0 text-xs'>{err}</p>
  </> )
 }
 
