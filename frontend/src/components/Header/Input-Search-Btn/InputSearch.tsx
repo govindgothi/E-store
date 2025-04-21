@@ -1,5 +1,6 @@
 import React from 'react'
 import { IoSearchOutline } from "react-icons/io5";
+import { Link } from 'react-router-dom';
 
 type InputSearchProp ={
   searchCompOpen:boolean
@@ -10,7 +11,8 @@ const InputSearch: React.FC<InputSearchProp> = ({setSearchCompOpen,searchCompOpe
   
   return (
     <div>
-      <div  className="text-2xl font-semibold" onClick={()=>{setSearchCompOpen(!searchCompOpen)}}><IoSearchOutline /></div>
+      <div  className="text-2xl font-semibold" onClick={()=>{setSearchCompOpen(!searchCompOpen)}}><Link to='product'><IoSearchOutline /></Link>
+      </div>
       {/* {isSearchOpen? <div className="text-2xl font-semibold"><IoSearchOutline /></div>} */}
     </div>
   )

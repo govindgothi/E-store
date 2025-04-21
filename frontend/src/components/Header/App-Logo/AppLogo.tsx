@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import organiclogo2 from "../../../assets/originallogo2.png";
+// import chatLogo from "../../../assets/chatLogo.png"
 const AppLogo = () => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 

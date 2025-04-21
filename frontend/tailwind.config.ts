@@ -10,7 +10,9 @@ export default {
     theme: {
       extend: {
         colors: {
-            primary:{
+          
+            cream: "#fefdf7",
+                      primary:{
                 yellow: '#F8C027', // Replace with your custom color     
                 blue:'#00ff' 
             },
@@ -18,6 +20,7 @@ export default {
                 nunito: ['Nunito', 'sans-serif'],
                 sans: ['"Merriweather Sans"', 'sans-serif'],
               },
+              
         },
         screens: {
           'xp':'340px',

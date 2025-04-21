@@ -32,6 +32,13 @@ const Header = () => {
           />
           <AppLogo />
         </div>
+        <div className="flex items-center justify-center gap-12 font-semibold text-2xl">
+          <ul className="pointer">Home</ul>
+          <ul>Collection</ul>
+          <ul>Shop All</ul>
+          <ul>Contact</ul>
+
+        </div>
         <div className="flex w-44 items-center justify-around sm:w-56">
           <InputSearch
             setSearchCompOpen={setSearchCompOpen}
