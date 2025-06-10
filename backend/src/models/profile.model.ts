@@ -4,6 +4,7 @@ interface IProfile extends Document{
     gender:string,
     dateOfBirth:string,
     about:string,
+    theme:boolean,
 }
 const profileSchema = new Schema<IProfile>({
     userImage:{
@@ -20,6 +21,10 @@ const profileSchema = new Schema<IProfile>({
         type: String,
         trim: true,
     },
+    theme:{
+        type:Boolean,
+        default:false
+    }
 })
 
 const Profile = model('Profile',profileSchema)

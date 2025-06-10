@@ -75,6 +75,25 @@ export const createAddressService = async (
     };
   }
 };
+
+export const getAddressById = async () =>{
+  try {
+     return {
+      address:'',
+      code:401,
+      success:false,
+      data:null
+    }
+  } catch (error) {
+    console.log("error while getting address",error)
+    return {
+      address:'',
+      code:401,
+      success:false,
+      data:null
+    }
+  }
+}
 export const listOfAddressService = async () => {};
 export const updateAddressByIdService = async () => {};
 export const deleteAddressByIdService = async () => {};

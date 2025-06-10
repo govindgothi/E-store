@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 interface IOrder extends Document {
   userName: string;
+  email:mongoose.Schema.Types.ObjectId,
   userId: mongoose.Schema.Types.ObjectId;
   products: {
     productId: mongoose.Schema.Types.ObjectId;
@@ -14,12 +15,13 @@ interface IOrder extends Document {
   paymentMethod: "COD" | "Credit Card" | "UPI" | "PayPal";
   orderStatus: "pending" | "confirmed" | "shipped" | "delivered" | "canceled";
   shippingAddress: {
-    fullName: string;
-    address: string;
-    city: string;
+    pinCode: number;
+    district: string;
     state: string;
-    zipCode: string;
     country: string;
+    town: string;
+    city: string;
+    address: string;
   };
   placedAt: Date;
   updatedAt: Date;
@@ -30,14 +32,20 @@ const OrderSchema = new Schema<IOrder>(
     userName: {
       type: String,
       ref: "User",
-      required: [true,'user name is must'],
-      trim:true,
+      required: [true, "user name is must"],
+      trim: true,
+    },
+    email: {
+      type: String,
+      ref: "User",
+      required: [true, "email name is must"],
+      trim: true,
     },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: [true,'user Id is must'],
-      trim:true,
+      required: [true, "user Id is must"],
+      trim: true,
     },
     products: [
       {
@@ -46,21 +54,21 @@ const OrderSchema = new Schema<IOrder>(
           ref: "Product",
           required: true,
         },
-        name:{
+        name: {
           type: String,
-          trim:true,
-          required:[true,'product name is must'],
+          trim: true,
+          required: [true, "product name is must"],
           validate: {
             validator: function (value: string) {
-              return value?.length<150;
+              return value?.length < 150;
             },
             message: (props: any) =>
               `length of name is less than 150. Provided: ${props.value}`,
           },
         },
-        price:{
+        price: {
           type: Number,
-          required:[true,'price is need for order completation']
+          required: [true, "price is need for order completation"],
         },
         quantity: {
           type: Number,
@@ -69,43 +77,49 @@ const OrderSchema = new Schema<IOrder>(
         },
       },
     ],
+
     totalAmount: {
       type: Number,
       required: true,
-      validate:{
-        validator:function(value:number){
-          let p:number = 0
-          this.products.map((item)=>{
-             p = p + item.price*item.quantity
-          })
-          return p === value
+      validate: {
+        validator: function (value: number) {
+          let p: number = 0;
+          this.products.map((item) => {
+            p = p + item.price * item.quantity;
+          });
+          return p === value;
         },
         message: (props: any) =>
           `price should not match from ordered value: ${props.value}`,
-      }
+      },
     },
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],
       default: "pending",
     },
+
     paymentMethod: {
       type: String,
       enum: ["COD", "Credit Card", "UPI", "PayPal"],
-      required: [true,'payment method is needed'],
+      required: [true, "payment method is needed"],
     },
+
     orderStatus: {
       type: String,
       enum: ["pending", "confirmed", "shipped", "delivered", "canceled"],
       default: "pending",
     },
+
     shippingAddress: {
-      fullName: { type: String, required: true },
-      address: { type: String, required: true },
-      city: { type: String, required: true },
+      pinCode: { type: Number, required: true },
+      district: { type: String, required: true },
       state: { type: String, required: true },
-      zipCode: { type: String, required: true },
       country: { type: String, required: true },
+      town: { type: String, required: true },
+      city: { type: String, required: true },
+      address: { type: String, required: true },
     },
     placedAt: {
       type: Date,
@@ -120,4 +134,4 @@ const OrderSchema = new Schema<IOrder>(
 );
 
 const Order = mongoose.model<IOrder>("Order", OrderSchema);
-export default Order;
+export { Order, IOrder};

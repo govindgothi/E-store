@@ -3,7 +3,7 @@ import { model, Schema } from "mongoose";
 interface IProduct extends Document {
   userId:Schema.Types.ObjectId
   name: string;
-  type: string;
+  category:string
   description: string[];
   price: number;
   discountPercentage: number;
@@ -11,6 +11,7 @@ interface IProduct extends Document {
   imageList: string[];
   stock: number;
   quantity: string;
+  WeightIn:string;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -24,7 +25,7 @@ const productSchema = new Schema<IProduct>({
     trim: true,
     required: [true, "Name is required"],
   },
-  type: {
+  category: {
     type: String,
     enum: [
       "Ghee",
@@ -107,8 +108,16 @@ const productSchema = new Schema<IProduct>({
       message: "quantity is must to list product",
     },
   },
+  WeightIn:{
+    type:String,
+    enum: [
+      "kg",
+      "ml",
+    ],
+    default:"Kg"    
+  }
 });
 
 const Product = model("Product", productSchema);
 
-export default Product;
+export { Product, IProduct};

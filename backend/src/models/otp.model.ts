@@ -32,10 +32,12 @@ const verifyOtpSchema = new Schema<verifyOtpType>({
    },
    sendOtp:{
     type:Number,
+    required:true,
+  
    },
    exp:{
     type: Date,
-    default: Date.now, // Store current timestamp
+    default: Date.now, 
     expires: 120, // Automatically delete after 120 seconds (2 minutes)
    }
 })

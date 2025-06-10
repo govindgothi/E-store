@@ -1,92 +1,71 @@
 import { NextFunction, Request, Response } from "express";
-import Product from "../models/product.model.js";
+import { Product } from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import multer from "multer";
-import path from "path";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+  createProductService,
+  getAllProductsService,
+  getProductByIdService,
+} from "../services/product.service.js";
 
-const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response) => {
   try {
-    const {
-      userId,
-      name,
-      type,
-      description,
-      price,
-      discountPercentage,
-      thumbNailImage,
-      imageList,
-      stock,
-      quantity,
-    } = req.body;
-
-    if (!userId || !name || !price) {
-      return res
-        .status(400)
-        .json({ error: "User ID, Name & Price are required" });
-    }
-
-    const newProduct = await Product.create({
-      userId,
-      name,
-      type,
-      description,
-      price,
-      discountPercentage,
-      thumbNailImage,
-      imageList,
-      stock,
-      quantity,
+    const productData = req.body;
+    const response = await createProductService(productData);
+    return res.status(response?.code).json(response);
+  } catch (error) {
+    console.log("error on creating product", error);
+    return res.status(501).json({
+      message: "error while creating product",
+      code: 501,
+      success: false,
+      data: null,
     });
-
-    res
-      .status(201)
-      .json({ message: "Product created successfully", data: newProduct });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", details: error.message });
   }
 };
 
-const getAllProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10 } = req.query;
+    console.log("page :",page,"limit :",limit)
+    console.log(req.query)
     const skip = (Number(page) - 1) * Number(limit);
-
-    const products = await Product.find().skip(skip).limit(Number(limit));
-    const total = await Product.countDocuments();
-
-    res.json({
-      message: "Products fetched successfully",
-      data: products,
-      total,
-      page: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
-    });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ error: "Failed to fetch products", details: error.message });
+    const response = await getAllProductsService(
+      Number(page),
+      Number(limit),
+      skip
+    );
+    return res.status(response?.code).json(response);
+  } catch (error) {
+    console.log("error while get product", error);
+    return {
+      message: "product is not found getting error",
+      code: 501,
+      success: false,
+      data: null,
+    };
   }
 };
 
-
-const getProductById = async (req: Request, res: Response) => {
+export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ error: "Product not found" });
-
-    res.json({ message: "Product found", data: product });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ error: "Error fetching product", details: error.message });
+    console.log("object",id)
+    const response = await getProductByIdService(id)
+    return res.status(response?.code).json(response)
+  } catch (error) {
+    console.log("error while fetching productById",error)
+    return res.status(501).json({
+      message:'Internal error, not getting data',
+      code:501,
+      success:false,
+      data:null
+    })
   }
 };
 
-// ✅ UPDATE PRODUCT (Partial Update)
+
 const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -122,6 +101,16 @@ const deleteProduct = async (req: Request, res: Response) => {
       .json({ error: "Error deleting product", details: error.message });
   }
 };
+
+const getTopProduct = asyncHandler(async (req: Request, res: Response) => {
+  const data = await Product.find({ top: true });
+  if (!data) return res.status(404).json({ error: "Product not found" });
+  res.status(201).json({
+    success: true,
+    message: "Top Products",
+    data,
+  });
+});
 
 const ListNewProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -172,13 +161,11 @@ const ListNewProduct = asyncHandler(
           .status(401)
           .json({ success: false, message: "product is not added" });
 
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "Product added successfully",
-          data: newProduct,
-        });
+      res.status(201).json({
+        success: true,
+        message: "Product added successfully",
+        data: newProduct,
+      });
     } catch (err) {
       console.log(err, "err");
     }
@@ -239,4 +226,4 @@ const uploadProduct = asyncHandler(
   }
 );
 
-export { ListNewProduct, updateProduct, uploadProduct, upload };
+export { ListNewProduct, updateProduct, uploadProduct, getTopProduct, upload };

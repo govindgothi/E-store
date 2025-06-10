@@ -1,11 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from "dotenv";
 dotenv.config();
-// cloudinary.config({ 
-//     cloud_name: process.env.CLD_CLOUD_NAME, 
-//     api_key: process.env.API_KEY, 
-//     api_secret: process.env.CLD_SECRET // Click 'View API Keys' above to copy your API secret
-// });
+
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Your Cloudinary cloud name
@@ -30,7 +26,7 @@ const uploadToCloudinary =  async(fileBuffer:Buffer | undefined,filename:string 
           }
         );
     
-        // ✅ Write the buffer to the stream
+        //  Write the buffer to the stream
         uploadResult.end(fileBuffer);
     
         return uploadResult;
