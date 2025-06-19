@@ -37,7 +37,7 @@ import addressRouter from './routes/address.route.js'
 import otpRouter from './routes/otp.route.js'
 import categoriesRouter from './routes/categories.route.js'
 import cartRouter from './routes/cart.route.js'
-import sessionRouter from './routes/session.route.js'
+import sessionRouter from './routes/guestSession.route.js'
 
 app.use('/api/v1/home',homeRouter)
 app.use('/api/v1/product',productRouter)

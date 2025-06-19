@@ -1,15 +1,19 @@
-class ApiResponse<T> {
-    statusCode: number;
-    data: T;
-    message: string;
-    success: boolean;
-
-    constructor(statusCode: number, data: T, message: string = "Success") {
-        this.statusCode = statusCode;
-        this.data = data;
-        this.message = message;
-        this.success = statusCode < 400;
-    }
+class ApiResponse {
+  statusCode: number;
+  message: string;
+  success: boolean;
+  data: any;
+  constructor(
+    statusCode: number,
+    message: string = "Success",
+    success: boolean,
+    data: any
+  ) {
+    this.statusCode = statusCode;
+    this.message = message;
+    this.success = typeof success === "boolean" ? success : statusCode < 400;
+    this.data = data;
+  }
 }
 
 export { ApiResponse };

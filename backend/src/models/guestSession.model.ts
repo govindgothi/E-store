@@ -1,9 +1,13 @@
 import { Schema, model } from "mongoose";
 
-const sessionSchema = new Schema({
-  sessionId: {
-    type: String,
-  },
+interface IGuestSession extends Document {
+  cartItem: {id:string,quantity:number}[],
+  createdAt:Date
+}
+
+
+const guestSessionSchema = new Schema<IGuestSession>({
+
   cartItem: [
     {
       id: { type: String, required: true },
@@ -17,6 +21,6 @@ const sessionSchema = new Schema({
   },
 });
 
-const Session = model("Session", sessionSchema);
+const GuestSession = model("GuestSession", guestSessionSchema);
 
-export { Session };
+export { GuestSession, IGuestSession};

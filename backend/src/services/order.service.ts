@@ -29,14 +29,14 @@ export const createorderService = async (orderData: IOrder) => {
     ) {
       for (const item of shippingAdd) {
         if (item.city.toLocaleLowerCase() === city) {
-            data.isCityValid = true
+          data.isCityValid = true;
         }
         if (item.state.toLocaleLowerCase() === state) {
-            data.isStateValid = true
+          data.isStateValid = true;
         }
         if (item.pinCode === pinCode) {
-            data.isPinCodeValid = true
-            return data
+          data.isPinCodeValid = true;
+          return data;
         }
       }
     }
@@ -47,7 +47,11 @@ export const createorderService = async (orderData: IOrder) => {
     };
 
     const isValid = isValidFullAddress(pinCode, city, state, checkData);
-    if (!isValid?.isCityValid && !isValid?.isPinCodeValid && !isValid?.isStateValid) {
+    if (
+      !isValid?.isCityValid &&
+      !isValid?.isPinCodeValid &&
+      !isValid?.isStateValid
+    ) {
       return {
         code: 401,
         message: "shipping address is not matched",
@@ -55,7 +59,7 @@ export const createorderService = async (orderData: IOrder) => {
         data: null,
       };
     }
-    
+
     const order = await Order.create({
       userName,
       email,

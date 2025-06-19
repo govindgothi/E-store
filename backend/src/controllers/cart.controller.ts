@@ -2,12 +2,8 @@ import { Request, Response } from "express";
 
 export const addToCart = async(req:Request,res:Response) =>{
 try {
-    return{
-     code:501,
-      message:'Internal error while adding cart',
-      data:null,
-      success:false   
-    }
+   const {productId} = req.body
+   
 } catch (error) {
     return {
       code:501,

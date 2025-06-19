@@ -1,12 +1,12 @@
-import { Session } from "../models/session.model.js";
+import { GuestSession } from "../models/guestSession.model.js";
 
 export const addToCartGuestService = async (
   id: string,
   quantity: number,
-  sid: string
+  gsid: string
 ) => {
   try {
-    const session = await Session.findById({ _id: sid });
+    const session = await GuestSession.findById({ _id: gsid });
     if (!session) {
       return {
         code: 401,
@@ -15,14 +15,14 @@ export const addToCartGuestService = async (
         message: "session not found",
       };
     }
-    const item = await Session.findOne({
-      _id: sid,
+    const item = await GuestSession.findOne({
+      _id: gsid,
       "cartItem.id": id,
     });
     if (item) {
-      const incQuantity = await Session.updateOne(
+      const incQuantity = await GuestSession.updateOne(
         {
-          _id: sid,
+          _id: gsid,
           "cartItem.id": id,
         },
         {
@@ -38,8 +38,8 @@ export const addToCartGuestService = async (
         message: "Item already present we inc quantity successfullt",
       };
     }
-    const addProduct = await Session.updateOne(
-      { _id: sid },
+    const addProduct = await GuestSession.updateOne(
+      { _id: gsid },
       { $push: { cartItem: { id: id, quantity: quantity } } }
     );
     return {
@@ -59,11 +59,11 @@ export const addToCartGuestService = async (
 };
 export const removeFromCartGuestService = async (
   cartItemId: string,
-  sid: string
+  gsid: string
 ) => {
   try {
-    const item = await Session.findOne({
-      _id: sid,
+    const item = await GuestSession.findOne({
+      _id: gsid,
       "cartItem.id": cartItemId,
     });
     if (!item) {
@@ -74,8 +74,8 @@ export const removeFromCartGuestService = async (
         message: "cartItem is not found",
       };
     }
-    const removeItem = await Session.updateOne(
-      { _id: sid },
+    const removeItem = await GuestSession.updateOne(
+      { _id: gsid },
       {
         $pull: {
           cartItem: { id: cartItemId },
@@ -91,7 +91,7 @@ export const removeFromCartGuestService = async (
   } catch (error) {}
 };
 export const updateCartGuestService = async (
-  sid: string,
+  gsid: string,
   cartItemId: string,
   query: string
 ) => {
@@ -100,9 +100,9 @@ export const updateCartGuestService = async (
     if (query === "dec") {
       add = -1;
     }
-    const session = await Session.updateOne(
+    const session = await GuestSession.updateOne(
       {
-        _id: sid,
+        _id: gsid,
         "cartItem.id": cartItemId,
       },
       {

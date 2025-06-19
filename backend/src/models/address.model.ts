@@ -27,7 +27,7 @@ const addressSchema = new Schema<IAddress>({
       },
        town: {
         type: String,
-        required: true,
+        // required: true,
       },
       address: {
         type: String,
@@ -45,7 +45,7 @@ const addressSchema = new Schema<IAddress>({
 
       pinCode: {
         type: Number,
-        required: [true, "zipcode is require"],
+        required: [true, "pipCode is require"],
         validate: {
           validator: function (value: number) {
             return /^\d{6}$/.test(value.toString());

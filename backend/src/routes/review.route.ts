@@ -1,8 +1,8 @@
 import Router from 'express'
-import { addReview } from '../controllers/review.controller.js'
+// import { addReview } from '../controllers/review.controller.js'
 
 const router = Router()
 
-router.route('/add').post(addReview)
+// router.route('/add').post(addReview)
 
 export default router

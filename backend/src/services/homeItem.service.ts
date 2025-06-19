@@ -1,69 +1,40 @@
 import { Categories } from "../models/categories.model.js";
 import { Product } from "../models/product.model.js";
-import { Session } from "../models/session.model.js";
-export const ItemListService = async (sid: string) => {
-  try {
-    const fav = await Product.find(
-      { favourite: true },
-      "productImageUrl productName"
-    );
-    const top = await Product.find(
-      { top: true },
-      "productImageUrl productName productPrice"
-    );
-    const topCateg = await Categories.find(
-      { top: true },
-      "categoryName thumbImageUrl"
-    );
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { createSessionIfNeeded } from "../utils/guestSession.js";
 
-    if (!(fav.length > 2 && top.length > 3 && topCateg.length > 3)) {
-      return {
-        message: "no data found",
-        code: 301,
-        success: true,
-        data: null,
-      };
+export const ItemListService = async (gsid: string) => {
+  try {
+    const [fav, top, topCateg] = await Promise.all([
+      Product.find({ favourite: true }, "productImageUrl productName"),
+      Product.find({ top: true }, "productImageUrl productName productPrice"),
+      Categories.find({ top: true }, "categoryName thumbImageUrl"),
+    ]);
+
+    const isSufficientData =
+      fav.length > 2 && top.length > 3 && topCateg.length > 3;
+
+    if (!isSufficientData) {
+      return new ApiResponse(204, "No data found", false, null);
     }
-    if (!sid) {
-      console.log("object sid",sid)
-      const sessions = await Session.create({});
-      return {
-        auth: {
-          sid: "sid",
-          sessionId: sessions.id,
-          option: {
-            httpOnly: true,
-            signed: true,
-            maxAge: 100 * 60 * 60,
-          },
-        },
-        message: "data is succesfully fetched",
-        code: 201,
-        success: true,
-        data: {
-          fav,
-          top,
-          topCateg,
-        },
-      };
+
+    const responsePayload: any = {
+      fav,
+      top,
+      topCateg,
+    };
+
+    if (!gsid) {
+      const sessionAuth = await createSessionIfNeeded();
+      return new ApiResponse(201, "Data fetched", true, {
+        auth: sessionAuth,
+        ...responsePayload,
+      });
     }
-    return {
-      message: "data is succesfully fetched",
-      code: 201,
-      success: true,
-      data: {
-        fav,
-        top,
-        topCateg,
-      },
-    };
-  } catch (error) {
-    console.log("error while getting data", error);
-    return {
-      message: "data is not found",
-      code: 501,
-      success: true,
-      data: null,
-    };
+
+    return new ApiResponse(201, "Data fetched", true, responsePayload);
+  } catch (err) {
+    console.error("Error in ItemListService:", err);
+    return new ApiResponse(500, "Internal Server Error", false, null);
   }
 };

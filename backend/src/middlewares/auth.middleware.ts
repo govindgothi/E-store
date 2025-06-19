@@ -1,47 +1,52 @@
 import { ApiError } from "../utils/ApiError.js";
-import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js";
 import { NextFunction, Request, Response } from "express";
-import dotenv from 'dotenv'
 import { asyncHandler } from "../utils/asyncHandler.js";
-dotenv.config()
-const AccessTokenSecret: string =
-  process.env.ACCESS_TOKEN_SECRET || "jsdhjsdchcdhsvcv";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { IUserSession, UserSession } from "../models/userSession.model.js";
 
+interface AuthRequest extends Request {
+  session?: any; // Define `user` as needed
+}
 
-  interface AuthRequest extends Request {
-    user?: any; // Define `user` as needed
-  }
-
- const verifyJWT = asyncHandler( async(req: AuthRequest, res:Response, next:NextFunction) => {
+export const verifyUser = asyncHandler(
+  async (req: AuthRequest, res: Response, next: Function) => {
     try {
-        const token = req.cookies.cookie //?.accessToken // take token from web to saved cookie 
-        
-         console.log("token",token);
-        if (!token) {
-            return res.json(new ApiError(401, "Unauthorized request"))
-        }
-    
-        const decodedToken:string| jwt.JwtPayload = jwt.verify(token, AccessTokenSecret) // verify and match the token from .env
+      const sid = req.signedCookies.sid;
+      console.log("sid",sid)
+      if (!sid) {
+        const response = new ApiResponse(
+          404,
+          "User has not signed",
+          false,
+          null
+        );
+        return res.status(404).json(response);
+      }
+      const session:IUserSession | null  = await UserSession.findById(sid);
+      if (!session || session == null) {
+        res.clearCookie("sid");
+        const response = new ApiResponse(
+          404,
+          "User has not signed",
+          false,
+          null
+        );
+        return res.status(404).json(response);
+      }
 
-        if(typeof decodedToken === 'string') return res.json(new ApiError(401, "Invalid access token"));
-        
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
-         // select means send user detail without  saved  "-password -refreshToken"
-        if (!user) {
-            throw new ApiError(401, "Invalid Access Token")
-        }
-          
-         req.user = user;
-         //  console.log(req.user) 
-        next() // and calling for next to execute 
-    }catch (error: unknown) {
-        if (error instanceof Error) {
-            throw new ApiError(401, error.message || "Invalid access token");
-        } else {
-            throw new ApiError(401, "Invalid access token");
-        }
-    }
-    
-})
-export {verifyJWT}
+      const user = await User.findOne({ _id: session.userSessionId }).lean();
+      if (!user) {
+       const response = new ApiResponse(
+          404,
+          "User has not signed",
+          false,
+          null
+        );
+        return res.status(404).json(response);
+      }
+      req.session = session;
+      next();
+    } catch (error) {}
+  }
+);
